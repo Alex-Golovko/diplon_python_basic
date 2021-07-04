@@ -27,9 +27,8 @@ class VK:
         }
         r = requests.get(get_photo_url, params={**self.params, **get_photo_params}).json()
         photos = r['response']['items']
-        for i in range(len(photos)):
-            most_big_photos = max(photos['sizes'], key=lambda p: p['height'] * p['width'])
-        return most_big_photos
+        # most_big_photos = max(photos['sizes'], key=lambda p: p['height'] * p['width'])
+        return photos
 
 
 
