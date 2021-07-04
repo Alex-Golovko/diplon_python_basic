@@ -1,6 +1,6 @@
 import requests
-from pprint import pprint
 import json
+
 
 class VK:
     url = 'https://api.vk.com/method/'
@@ -23,14 +23,15 @@ class VK:
         get_photo_params = {
             'owner_id': id,
             'album_id': album_id,
-            'extended': '1',
-            'photo_sizes': '1'
+            'extended': '1'
         }
         r = requests.get(get_photo_url, params={**self.params, **get_photo_params}).json()
-        return r['response']['items'][0]['likes']
+        photos = r['response']['items']
+        for i in range(len(photos)):
+            most_big_photos = max(photos['sizes'], key=lambda p: p['height'] * p['width'])
+        return most_big_photos
 
-        # return self.write_data(r)
 
-    # def write_data(self, data):
-    #     with open('response.json', 'w') as file:
-    #         json.dumps(data, file, indent=2, ensure_ascii=False)
+    def write_json(self, data):
+        with open('response.json', 'w') as file_object:
+            json.dump(data, file_object, indent=2, ensure_ascii=False)

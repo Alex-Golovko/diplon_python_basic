@@ -7,4 +7,7 @@ with open('token_vk.txt', 'r', encoding='utf-8') as file:
     token = file.read().strip()
 
 vk_user = VK(token, '5.131')
-pprint(vk_user.get_user_photos('552934290', 'profile'))
+
+data_ = vk_user.get_user_photos('552934290', 'profile')
+
+vk_user.write_json(data_)
