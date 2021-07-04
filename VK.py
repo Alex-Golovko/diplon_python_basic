@@ -32,6 +32,7 @@ class VK:
         return most_big_photos
 
 
+
     def write_json(self, data):
         with open('response.json', 'w') as file_object:
             json.dump(data, file_object, indent=2, ensure_ascii=False)
