@@ -10,5 +10,5 @@ vk_user = VK(token, '5.131')
 
 data_ = vk_user.get_user_photos('552934290', 'profile')
 
-
+# vk_user.get_max_size(data_)
 vk_user.write_json(data_)
