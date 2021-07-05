@@ -23,14 +23,18 @@ class VK:
         get_photo_params = {
             'owner_id': id,
             'album_id': album_id,
-            'extended': '1'
+            'extended': 1,
+            'photo_sizes': 1
         }
         r = requests.get(get_photo_url, params={**self.params, **get_photo_params}).json()
+        sizes = []
         photos = r['response']['items']
-        # most_big_photos = max(photos['sizes'], key=lambda p: p['height'] * p['width'])
-        return photos
+        for i in photos[0:]:
+            sizes.append('{}'.format(i['sizes']))
+        return sizes
 
-
+    def max_sizes(self, data):
+        
 
     def write_json(self, data):
         with open('response.json', 'w') as file_object:
