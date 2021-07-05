@@ -1,5 +1,6 @@
 import requests
 import json
+from pprint import pprint
 
 
 class VK:
@@ -33,8 +34,10 @@ class VK:
             sizes.append('{}'.format(i['sizes']))
         return sizes
 
-    def max_sizes(self, data):
-        
+    # def max_sizes(self, data):
+    #     for i in range(len(data)):
+    #     most_big_photo = max(data, key=lambda p: p['height'] * p['width'])
+    #     return most_big_photo
 
     def write_json(self, data):
         with open('response.json', 'w') as file_object:
