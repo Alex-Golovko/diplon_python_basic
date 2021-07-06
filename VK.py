@@ -32,7 +32,8 @@ class VK:
         photos = r['response']['items']
         for i in photos[0:]:
             sizes.append('{}'.format(i['sizes']))
-        return sizes
+        loader_sizes = json.load(sizes)
+        return loader_sizes
 
     # def max_sizes(self, data):
     #     for i in range(len(data)):
