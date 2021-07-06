@@ -57,7 +57,7 @@ class VK:
             for j in pic_likes:
                 if i != j and i.startswith(j):
                     pic_name.append(str(pic_likes[i]) +'.jpg')
-                    print(i, j)
+                    print(i, j) 
         #         else:
         #             pic_name.append(str(pic_likes[i]) + str(pic_date[i]) + '.jpg')
         # print(pic_name)
