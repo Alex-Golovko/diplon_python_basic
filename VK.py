@@ -31,7 +31,7 @@ class VK:
             sizes = photo['sizes']
             max_size_url = max(sizes, key=self.get_largest)['url']
             size_url.append(max_size_url)
-        print(size_url)
+        return size_url
         
 
 
@@ -41,15 +41,12 @@ class VK:
       else:
         return data['height']
 
-    def download_photo(self, filename):
-        url = 'https://sun9-28.userapi.com/impf/c850732/v850732336/16fa43/3b7pxN3vzmI.jpg?size=400x400&quality=96&sign=e43d16ae62020287b2e5ae9073d3f878&c_uniq_tag=5rB9bM19KvnvwLaYvsXilF2uT-MWISzsiNrvNJH65UQ&type=album'
-        names = self.get_name(filename)[0]
-        # for i in range(len(url)):
-        r = requests.get(url[i], stream=True)
-            # for j in range(len(names)):
-            with open(names[j], 'wb') as file:
-                for chunk in r.iter_content(4096):
-                    file.write(chunk)
+    def download_photo(self, url, name):
+        r = requests.get(url, stream=True)
+
+        with open(name, 'wb') as file:
+            for chunk in r.iter_content(4096):
+                file.write(chunk)
          
     def get_name_list(self, file):
         pic_likes = []
@@ -70,7 +67,7 @@ class VK:
         name = []
         for pic_name in name_list:
             name.append(pic_name + '.jpg')
-        return name
+            self.download_photo(self.photos(names), name)
         
     def write_json(self, data):
         with open('photos.json', 'w') as file_object:
