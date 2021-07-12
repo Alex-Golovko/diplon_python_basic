@@ -1,3 +1,4 @@
+from os import name
 import requests
 import json
 from pprint import pprint
@@ -21,7 +22,7 @@ class VK:
             'photo_sizes': 1
         }
         r = requests.get(get_photo_url, params={**self.params, **get_photo_params}).json()
-        self.write_json(r['response']['items'])
+        self.write_json(r['response']['items'], 'photos')
 
 
     def photos(self, file):
@@ -33,6 +34,14 @@ class VK:
             size_url.append(max_size_url)
         return size_url
         
+    def photos_types(self, file):
+        size_type = []
+        photos_type = json.load(open(file))
+        for photo in photos_type:
+            types = photo['sizes']
+            max_size_type = max(types, key=self.get_largest)['type']
+            size_type.append(max_size_type)
+        return size_type
 
 
     def get_largest(self, data):
@@ -71,9 +80,14 @@ class VK:
         name = []
         for pic_name in name_list:
             name.append(pic_name + '.jpg')
-            # self.download_photo(self.photos(names), name)
         return name
 
-    def write_json(self, data):
-        with open('photos.json', 'w') as file_object:
+    def discription_file(self, name, type_sizes):
+        key_name = name
+        sizes = type_sizes
+        for i in range(len(key_name)):
+            self.write_json({"file_name": name[i], "sizes": sizes[i]}, name[i])
+
+    def write_json(self, data, name):
+        with open(name + '.json', 'w') as file_object:
             json.dump(data, file_object, indent=2, ensure_ascii=False)
