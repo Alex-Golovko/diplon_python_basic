@@ -9,5 +9,6 @@ with open('token_vk.txt', 'r', encoding='utf-8') as file:
 vk_user = VK(token, '5.131')
 
 data_ = vk_user.get_user_photos('552934290', 'profile')
-
-vk_user.get_name('photos.json')
+url = vk_user.photos('photos.json')
+name = vk_user.get_name('photos.json')
+vk_user.download_photo(url, name)

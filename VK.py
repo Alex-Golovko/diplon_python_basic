@@ -42,11 +42,15 @@ class VK:
         return data['height']
 
     def download_photo(self, url, name):
-        r = requests.get(url, stream=True)
+        url_photo = url
+        name_photo = name
+        all = dict(zip(name_photo, url_photo))
+        for key, value in all.items():
+            r = requests.get(value, stream=True)
 
-        with open(name, 'wb') as file:
-            for chunk in r.iter_content(4096):
-                file.write(chunk)
+            with open(key, 'wb') as file:
+                for chunk in r.iter_content(4096):
+                    file.write(chunk)
          
     def get_name_list(self, file):
         pic_likes = []
@@ -58,17 +62,18 @@ class VK:
         idx = [i for i, x in enumerate(pic_likes) if x in filter(lambda x: pic_likes.count(x) > 1, set(pic_likes))]
         for i in idx:
             old_index = pic_likes.pop(i)
-            new_index = old_index + pic_date[i]
+            new_index = old_index + '_' + pic_date[i]
             pic_likes.insert(i, new_index)
         return pic_likes
         
-    def get_name(self, names):
-        name_list = self.get_name_list(names)
+    def get_name(self, name_l):
+        name_list = self.get_name_list(name_l)
         name = []
         for pic_name in name_list:
             name.append(pic_name + '.jpg')
-            self.download_photo(self.photos(names), name)
-        
+            # self.download_photo(self.photos(names), name)
+        return name
+
     def write_json(self, data):
         with open('photos.json', 'w') as file_object:
             json.dump(data, file_object, indent=2, ensure_ascii=False)
