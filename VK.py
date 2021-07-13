@@ -1,7 +1,9 @@
-from os import name
+import os
 import requests
 import json
 from pprint import pprint
+
+
 
 
 class VK:
@@ -50,14 +52,18 @@ class VK:
       else:
         return data['height']
 
-    def download_photo(self, url, name):
+    def make_dir(self, dir_name):
+        if not os.path.isdir(dir_name):
+            os.mkdir(dir_name)
+
+    def download_photo(self, url, name, dir_name):
         url_photo = url
         name_photo = name
         all = dict(zip(name_photo, url_photo))
+        self.make_dir(dir_name)
         for key, value in all.items():
             r = requests.get(value, stream=True)
-
-            with open(key, 'wb') as file:
+            with open(f'{dir_name}/{key}', 'wb') as file:
                 for chunk in r.iter_content(4096):
                     file.write(chunk)
          
@@ -83,10 +89,12 @@ class VK:
         return name
 
     def discription_file(self, name, type_sizes):
+        discript_dict = []
         key_name = name
         sizes = type_sizes
         for i in range(len(key_name)):
-            self.write_json({"file_name": name[i], "sizes": sizes[i]}, name[i])
+            discript_dict.append({"file_name": name[i], "sizes": sizes[i]})
+        self.write_json(discript_dict, 'discription')
 
     def write_json(self, data, name):
         with open(name + '.json', 'w') as file_object:
