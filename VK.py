@@ -1,8 +1,10 @@
 import os
+import yadisk
 import requests
 import json
 from pprint import pprint
-
+import time
+from tqdm import tqdm
 
 
 
@@ -61,12 +63,16 @@ class VK:
         name_photo = name
         all = dict(zip(name_photo, url_photo))
         self.make_dir(dir_name)
+        
         for key, value in all.items():
-            r = requests.get(value, stream=True)
-            with open(f'{dir_name}/{key}', 'wb') as file:
-                for chunk in r.iter_content(4096):
-                    file.write(chunk)
-         
+            for i in tqdm(all):
+                r = requests.get(value, stream=True)
+                with open(f'{dir_name}/{key}', 'wb') as file:
+                    for chunk in r.iter_content(4096):
+                        file.write(chunk)
+            time.sleep(1)
+
+
     def get_name_list(self, file):
         pic_likes = []
         pic_date = []

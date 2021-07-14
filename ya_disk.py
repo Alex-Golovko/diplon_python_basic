@@ -1,5 +1,6 @@
 from pprint import pprint
-
+from tqdm import tqdm
+import time
 import requests
 
 class YandexDisk:
@@ -12,11 +13,7 @@ class YandexDisk:
             'Content-Type': 'application/json',
             'Authorization': 'OAuth {}'.format(self.token)
         }
-    def get_file_list(self):
-        files_url = 'https://cloud-api.yandex.net/v1/disk/resources/files'
-        headers = self.get_headers()
-        response = requests.get(files_url, headers=headers)
-        return response.json()
+  
 
     def _get_upload_link(self, disk_file_path):
         upload_url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
@@ -27,7 +24,7 @@ class YandexDisk:
 
     def upload_file_to_disk(self, disk_file_path, filename):
         href = self._get_upload_link(disk_file_path=disk_file_path).get('href','')
-        response = requests.put(href, data=open(filename,'rb'))
+        response = requests.put(href, data=filename)
         response.raise_for_status()
         if response.status_code == 201:
             print('Success')
