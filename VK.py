@@ -1,83 +1,50 @@
-import os
-import yadisk
+from ya_disk import YaDisk
 import requests
 import json
-from pprint import pprint
-import time
 from tqdm import tqdm
 
-
+with open('token_yadisk.txt', 'r', encoding='utf-8') as file:
+    token_ya = file.read().strip()
+    
 
 class VK:
     url = 'https://api.vk.com/method/'
-    def __init__(self, token, version):
+    def __init__(self, token, user_id, count=5, offset=0):
+        self.user_id = user_id
+        self.count = count
+        self.offset = offset
         self.params = {
             'access_token': token,
-            'v': version
+            'v': '5.131'
         }
 
 
-    def get_user_photos(self, id, album_id):
+    def get_user_photos(self):
         get_photo_url = self.url + 'photos.get'
         get_photo_params = {
-            'owner_id': id,
-            'album_id': album_id,
+            'owner_id': self.user_id,
+            'album_id': 'profile',
             'extended': 1,
-            'photo_sizes': 1
+            'photo_sizes': 1,
+            'count': self.count,
+            'offset': self.offset
         }
         r = requests.get(get_photo_url, params={**self.params, **get_photo_params}).json()
-        self.write_json(r['response']['items'], 'photos')
+        return r
 
 
-    def photos(self, file):
-        size_url = []
-        photos = json.load(open(file))
-        for photo in photos:
-            sizes = photo['sizes']
-            max_size_url = max(sizes, key=self.get_largest)['url']
-            size_url.append(max_size_url)
-        return size_url
-        
-    def photos_types(self, file):
-        size_type = []
-        photos_type = json.load(open(file))
-        for photo in photos_type:
-            types = photo['sizes']
-            max_size_type = max(types, key=self.get_largest)['type']
-            size_type.append(max_size_type)
-        return size_type
+
+    def count_photos(self):
+        data = self.get_user_photos()
+        count_photo = data['response']['count']
+        return count_photo
 
 
-    def get_largest(self, data):
-      if data['width'] >= data['height']:
-        return data['width']
-      else:
-        return data['height']
-
-    def make_dir(self, dir_name):
-        if not os.path.isdir(dir_name):
-            os.mkdir(dir_name)
-
-    def download_photo(self, url, name, dir_name):
-        url_photo = url
-        name_photo = name
-        all = dict(zip(name_photo, url_photo))
-        self.make_dir(dir_name)
-        
-        for key, value in all.items():
-            for i in tqdm(all):
-                r = requests.get(value, stream=True)
-                with open(f'{dir_name}/{key}', 'wb') as file:
-                    for chunk in r.iter_content(4096):
-                        file.write(chunk)
-            time.sleep(1)
-
-
-    def get_name_list(self, file):
+    def get_name_list(self):
         pic_likes = []
         pic_date = []
-        names = json.load(open(file))
-        for name in names:
+        base = self.get_user_photos()
+        for name in base['response']['items']:
             pic_likes.append(str(name['likes']['count']))
             pic_date.append(str(name['date']))
         idx = [i for i, x in enumerate(pic_likes) if x in filter(lambda x: pic_likes.count(x) > 1, set(pic_likes))]
@@ -87,21 +54,42 @@ class VK:
             pic_likes.insert(i, new_index)
         return pic_likes
         
-    def get_name(self, name_l):
-        name_list = self.get_name_list(name_l)
-        name = []
-        for pic_name in name_list:
-            name.append(pic_name + '.jpg')
-        return name
+    def get_photo_size(self):
+        size_type = []
+        base = self.get_user_photos()
+        for photo in base['response']['items']:
+            size_type.append(photo['sizes'][-1]['type'])
+        return size_type
 
-    def discription_file(self, name, type_sizes):
-        discript_dict = []
-        key_name = name
-        sizes = type_sizes
-        for i in range(len(key_name)):
-            discript_dict.append({"file_name": name[i], "sizes": sizes[i]})
-        self.write_json(discript_dict, 'discription')
+    def get_url(self):
+        file_url = []
+        base = self.get_user_photos()
+        for files in base['response']['items']:
+            file_url.append(files['sizes'][-1]['url'])
+        return file_url
 
-    def write_json(self, data, name):
-        with open(name + '.json', 'w') as file_object:
-            json.dump(data, file_object, indent=2, ensure_ascii=False)
+
+    def download_photo(self):
+        photo_list = []
+        name_photo = self.get_name_list()
+        size = self.get_photo_size()
+        all = dict(zip(name_photo, size))
+        file_name = []
+        for key, value in all.items():
+            file_name.append(key + '{}'.format('.jpg'))
+            file_name_2 = key + '{}'.format('.jpg')
+            photo_dict = {'File name': file_name_2, 'sizes': value}
+            photo_list.append(photo_dict)
+            with open('List_photos.json', 'w') as file:
+                json.dump(photo_list, file)
+        return file_name
+
+    def upload_photos_ya(self):
+        key_name = self.download_photo()
+        url = self.get_url()
+        all = dict(zip(key_name, url))
+        for key, value in tqdm(all.items(), ascii=True, desc='Загрузка файлов на Яндекс Диск'):
+            get_url = requests.get(value)
+            upload_ya = YaDisk(token=token_ya)
+            upload_ya.upload_file_to_disk('Photos/{}'.format(key), get_url.content)
+        

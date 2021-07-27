@@ -1,23 +1,46 @@
-import requests
-import json
-from pprint import pprint
 from VK import VK
-from ya_disk import YandexDisk
+
 
 with open('token_vk.txt', 'r', encoding='utf-8') as file:
     token = file.read().strip()
 
-with open('token_yadisk.txt', 'r', encoding='utf-8') as file:
-    token_ya = file.read().strip()
+HELP = """
+В данной программе происходит скачивание фотографий с профиля Вконтакте
+для начала работы Вам необходимо:
+1. Создать в каталоге 2 файла в формале txt;
+1.1 Файл txt с токеном VK
+1.2 Файл txt с токеном Яндекс Диск
+2. На Яндекс Диске создать папку 'Photos/'
+3. Ввести id пользователя
+4. Нажать 'Enter', Вы увидите строку загрузки файлов
+5. После загрузки в каталоге появиться файл 'List_photos' с названием и размером фотографии
 
-vk_user = VK(token, '5.131')
+Список доступных команд:
+help - справка по программе
 
-data_ = vk_user.get_user_photos('552934290', 'profile')
-url = vk_user.photos('photos.json')
-name = vk_user.get_name('photos.json')
-type = vk_user.photos_types('photos.json')
-vk_user.download_photo(url, name, 'Photo')
-vk_user.discription_file(name, type)
+id -  ввести id профиля
 
-y = YandexDisk(token_ya)
-y.upload_file_to_disk('/Photo/', name)
+exit - команда выхода из программы"""
+
+# vk_user = VK(token, '552934290')
+def main():
+    print('Программа скачивания фотографий из VK.com на Yandex.disk\n'
+          'справка по программе: help\n')
+    stop = False
+    while not stop:
+        command = input("Введите команду:\n")
+        if command == "help":
+            print(HELP)
+        elif command == "id":
+            user_id_input = input('Введите id пользователя:№\n')
+            user_count_photos = input('Введите количество фотографий на скачивание:\n')
+            down_vk = VK(token=token, user_id=user_id_input, count=int(user_count_photos))
+            down_vk.upload_photos_ya()
+        elif command == "exit":
+            print("Спасибо за использование программы")
+            stop = True
+        else:
+            print("Неизвестная команда")
+
+if __name__ == "__main__":
+    main()
