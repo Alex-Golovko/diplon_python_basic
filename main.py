@@ -29,9 +29,8 @@ if __name__ == "__main__":
             user_token_vk = input('Введите token VK:\n')
             user_token_ya = input('Введите token YandexDisk:\n')
             user_id_input = input('Введите id пользователя:№\n')
-            photo_path = input('Введите наименование папки для сохранения фото:\n')
             down_vk = VK(token=user_token_vk, user_id=user_id_input)
-            down_vk.upload_photos_ya(user_token_ya, photo_path)
+            down_vk.upload_photos_ya(user_token_ya)
         elif command == "exit":
             print("Спасибо за использование программы")
             stop = True

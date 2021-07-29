@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 class VK:
     url = 'https://api.vk.com/method/'
- 
+
     def __init__(self, token, user_id, count=5, offset=0):
         self.user_id = user_id
         self.count = count
@@ -17,7 +17,7 @@ class VK:
         }
         self.photos = None
 
-    def get_user_photos(self):        
+    def get_user_photos(self):
         get_photo_url = self.url + 'photos.get'
         get_photo_params = {
             'owner_id': self.user_id,
@@ -28,7 +28,7 @@ class VK:
             'offset': self.offset
         }
         r = requests.get(get_photo_url, params={
-                         **self.params, **get_photo_params}).json()
+            **self.params, **get_photo_params}).json()
         return r
 
     def get_name_list(self):
@@ -62,9 +62,9 @@ class VK:
         photo_list = []
         name_photo = self.get_name_list()
         size = self.get_photo_size()
-        all = dict(zip(name_photo, size))
+        all_dict = dict(zip(name_photo, size))
         file_name = []
-        for key, value in all.items():
+        for key, value in all_dict.items():
             file_name.append(key + '{}'.format('.jpg'))
             file_name_2 = key + '{}'.format('.jpg')
             photo_dict = {'File name': file_name_2, 'sizes': value}
@@ -73,13 +73,14 @@ class VK:
             json.dump(photo_list, file)
         return file_name
 
-    def upload_photos_ya(self, token, dir_name):
+    def upload_photos_ya(self, token):
+        target_path = input('Введите имя директории для сохранения файлов:\n')
+        upload_ya = YaDisk(token=token)
+        upload_ya.create_path(target_path)
         key_name = self.download_photo()
         url = self.get_url()
-        all = dict(zip(key_name, url))
-        path = dir_name
-        upload_ya = YaDisk(token=token)
-        for key, value in tqdm(all.items(), ascii=True, desc='Загрузка файлов на Яндекс Диск'):
-            get_url = requests.get(value)
-            upload_ya.upload_file_to_disk(
-                path + '/{}'.format(key), key, get_url.content)
+        all_dict = dict(zip(key_name, url))
+        for key, value in tqdm(all_dict.items(), ascii=True, desc='Загрузка файлов на Яндекс Диск'):
+            get_url = requests.get(value).content
+            get_name = key
+            upload_ya.upload_file_to_disk(get_url, get_name, target_path)
