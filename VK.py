@@ -34,8 +34,8 @@ class VK:
     def get_name_list(self):
         pic_likes = []
         pic_date = []
-        self.photos = self.get_user_photos()
-        for name in self.photos['response']['items']:
+        self.photos = self.get_user_photos()['response']['items']
+        for name in self.photos:
             pic_likes.append(str(name['likes']['count']))
             pic_date.append(str(name['date']))
         idx = [i for i, x in enumerate(pic_likes) if x in filter(
@@ -46,15 +46,19 @@ class VK:
             pic_likes.insert(i, new_index)
         return pic_likes
 
+    def count_photos(self):
+        count = self.get_user_photos()['response']['count']
+        return count
+
     def get_photo_size(self):
         size_type = []
-        for photo in self.photos['response']['items']:
+        for photo in self.photos:
             size_type.append(photo['sizes'][-1]['type'])
         return size_type
 
     def get_url(self):
         file_url = []
-        for files in self.photos['response']['items']:
+        for files in self.photos:
             file_url.append(files['sizes'][-1]['url'])
         return file_url
 
